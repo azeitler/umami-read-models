@@ -9,7 +9,8 @@ Gem::Specification.new do |spec|
   spec.email = ["me@azeitler.com"]
 
   spec.summary = "Read-only ActiveRecord models for Umami Analytics database"
-  spec.description = "Provides read-only ActiveRecord models for accessing Umami Analytics data directly from Rails applications"
+  spec.description = "Provides read-only ActiveRecord models for accessing Umami Analytics data " \
+                     "directly from Rails applications"
   spec.homepage = "https://github.com/azeitler/umami-read-models"
   spec.required_ruby_version = ">= 3.0.0"
 
@@ -35,4 +36,5 @@ Gem::Specification.new do |spec|
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

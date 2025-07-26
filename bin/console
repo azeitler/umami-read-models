@@ -28,7 +28,7 @@ puts "  - Umami::Models::TeamUser"
 puts "  - Umami::Models::Report"
 puts ""
 puts "Configure your database connection first:"
-puts '  Umami::Models.configure { |c| c.database = :umami }'
+puts "  Umami::Models.configure { |c| c.database = :umami }"
 puts ""
 
 require "irb"

@@ -24,9 +24,9 @@ module Umami
       def self.inherited(subclass)
         super
         # Apply the database configuration when a model inherits from Base
-        if Umami::Models.database
-          subclass.connects_to database: Umami::Models.database
-        end
+        return unless Umami::Models.database
+
+        subclass.connects_to database: Umami::Models.database
       end
 
       def readonly?

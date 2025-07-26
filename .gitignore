@@ -1,0 +1,42 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
+# RubyGem build artifacts
+*.gem
+*.rbc
+.rspec_status
+
+# Bundler
+Gemfile.lock
+.bundle
+vendor/bundle
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test artifacts
+/test/reports/
+/test/tmp/
+/test/version_tmp/
+
+# Documentation
+/.yardoc/
+/_yardoc/
+/doc/
+/rdoc/
+
+# Environment
+.env
+.env.local
+.env.*.local

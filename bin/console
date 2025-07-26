@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "umami/models"
+
+# Example configuration (update with your database settings)
+# Umami::Models.configure do |config|
+#   config.database = :umami
+#   config.table_prefix = ""
+# end
+
+# You can add fixtures and/or initialization code here to make experimenting
+# with your gem easier. You can also use a different console, if you like.
+
+puts "Umami Read Models Console"
+puts "========================"
+puts ""
+puts "Available models:"
+puts "  - Umami::Models::User"
+puts "  - Umami::Models::Website"
+puts "  - Umami::Models::Session"
+puts "  - Umami::Models::WebsiteEvent"
+puts "  - Umami::Models::EventData"
+puts "  - Umami::Models::SessionData"
+puts "  - Umami::Models::Team"
+puts "  - Umami::Models::TeamUser"
+puts "  - Umami::Models::Report"
+puts ""
+puts "Configure your database connection first:"
+puts '  Umami::Models.configure { |c| c.database = :umami }'
+puts ""
+
+require "irb"
+IRB.start(__FILE__)

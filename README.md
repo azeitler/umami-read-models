@@ -69,9 +69,9 @@ Umami::Models.configure do |config|
 end
 ```
 
-This uses Rails' built-in database roles where:
-- `:writing` - Used for write operations (INSERT, UPDATE, DELETE)
-- `:reading` - Used for read operations (SELECT)
+This uses Rails' built-in database roles. Even though the models are read-only, Rails still requires 
+a `:writing` connection to be defined. Both connections can point to the same database, or you can 
+use a read replica for the `:reading` connection for better performance.
 
 ## Usage
 

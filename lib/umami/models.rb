@@ -9,34 +9,43 @@ module Umami
     class Error < StandardError; end
 
     class << self
-      attr_accessor :table_prefix, :database
+      attr_accessor :database
 
       def configure
         yield self
+        apply_configuration! if database
+      end
+
+      def apply_configuration!
+        return unless database
+
+        # Apply to Base and all its descendants
+        if database.is_a?(Hash)
+          Base.connects_to database: database
+        else
+          Base.connects_to database: { writing: database, reading: database }
+        end
       end
     end
 
-    self.table_prefix = ""
     self.database = nil
 
     # Base class for all Umami models with read-only enforcement
     class Base < ActiveRecord::Base
       self.abstract_class = true
 
-      def self.inherited(subclass)
-        super
-        # Apply the database configuration when a model inherits from Base
-        return unless Umami::Models.database
-
-        subclass.connects_to database: Umami::Models.database
-      end
-
       def readonly?
         true
       end
 
-      def self.table_name
-        "#{Umami::Models.table_prefix}#{super}"
+      # Prevent any write operations
+      before_save :prevent_writes
+      before_destroy :prevent_writes
+
+      private
+
+      def prevent_writes
+        raise ActiveRecord::ReadOnlyRecord, "Umami models are read-only"
       end
     end
   end

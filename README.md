@@ -5,11 +5,9 @@ A Ruby gem that provides read-only ActiveRecord models for accessing Umami Analy
 ## Features
 
 - Read-only ActiveRecord models for all Umami database tables
-- Support for PostgreSQL connections
+- Support for PostgreSQL connections  
 - Built-in query scopes for common analytics queries
 - Association mappings between models
-- Configurable table prefix support
-- Thread-safe connection management
 
 ## Installation
 
@@ -47,31 +45,23 @@ production:
     password: <%= ENV['UMAMI_DB_PASSWORD'] %>
 ```
 
-Then configure the gem in an initializer (e.g., `config/initializers/umami_read_models.rb`):
+Configure the gem in an initializer (e.g., `config/initializers/umami_read_models.rb`):
 
 ```ruby
+# For a simple setup with one database
 Umami::Models.configure do |config|
-  # Specify which database configuration to use
   config.database = :umami
-  
-  # Optional: Set a table prefix if your Umami tables use one
-  config.table_prefix = "umami_"
 end
-```
 
-### Advanced Multi-Database Configuration
-
-For read replicas:
-
-```ruby
+# Or for read replicas
 Umami::Models.configure do |config|
   config.database = { writing: :umami, reading: :umami_replica }
 end
 ```
 
-This uses Rails' built-in database roles. Even though the models are read-only, Rails still requires 
-a `:writing` connection to be defined. Both connections can point to the same database, or you can 
-use a read replica for the `:reading` connection for better performance.
+**Important**: The configuration must be set during application initialization, not in an `after_initialize` block.
+
+**Note about read replicas**: Even though the models are read-only, Rails still requires a `:writing` connection to be defined. Both connections can point to the same database if you don't have a read replica.
 
 ## Usage
 
@@ -197,15 +187,19 @@ params = report.parsed_parameters
 
 ## Read-Only Protection
 
-All models are read-only by default. Any attempt to create, update, or delete records will fail:
+All models are read-only. Any attempt to create, update, or delete records will raise an error:
 
 ```ruby
-# This will raise an error
+# Creating records will raise an error
 website = Umami::Models::Website.new(name: "Test")
 website.save # => raises ActiveRecord::ReadOnlyRecord
 
-# This will also raise an error
-Umami::Models::Website.find(id).update(name: "New Name")
+# Updating records will raise an error
+website = Umami::Models::Website.find(id)
+website.update(name: "New Name") # => raises ActiveRecord::ReadOnlyRecord
+
+# Deleting records will raise an error
+website.destroy # => raises ActiveRecord::ReadOnlyRecord
 ```
 
 ## Advanced Usage
@@ -228,20 +222,26 @@ Umami::Models::WebsiteEvent
 
 ### Raw SQL
 
-For complex analytics queries, you can use raw SQL:
+For complex analytics queries, you can use raw SQL with proper parameterization:
 
 ```ruby
-results = Umami::Models::Base.connection.execute(<<-SQL)
+sql = <<-SQL
   SELECT 
     DATE(created_at) as date,
     COUNT(DISTINCT session_id) as visitors,
     COUNT(*) as page_views
   FROM website_event
-  WHERE website_id = '#{website_id}'
-    AND created_at >= '#{30.days.ago}'
+  WHERE website_id = ?
+    AND created_at >= ?
   GROUP BY DATE(created_at)
   ORDER BY date DESC
 SQL
+
+results = Umami::Models::Base.connection.exec_query(
+  sql, 
+  'SQL', 
+  [[nil, website_id], [nil, 30.days.ago]]
+)
 ```
 
 ## Development

@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents a user in the Umami analytics system
     class User < Base
       self.table_name = "user"
       self.primary_key = "user_id"

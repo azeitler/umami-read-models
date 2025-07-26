@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents a page view or custom event
     class WebsiteEvent < Base
       self.table_name = "website_event"
       self.primary_key = "event_id"

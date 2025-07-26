@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents a team for multi-tenancy
     class Team < Base
       self.table_name = "team"
       self.primary_key = "team_id"

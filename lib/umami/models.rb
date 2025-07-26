@@ -4,6 +4,7 @@ require_relative "models/version"
 require "active_record"
 
 module Umami
+  # Provides read-only ActiveRecord models for accessing Umami Analytics data
   module Models
     class Error < StandardError; end
 
@@ -18,6 +19,7 @@ module Umami
     self.table_prefix = ""
     self.database = nil
 
+    # Base class for all Umami models with read-only enforcement
     class Base < ActiveRecord::Base
       self.abstract_class = true
 

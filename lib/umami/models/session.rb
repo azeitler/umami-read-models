@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents a visitor session
     class Session < Base
       self.table_name = "session"
       self.primary_key = "session_id"

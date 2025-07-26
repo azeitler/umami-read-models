@@ -10,8 +10,6 @@ Style/StringLiteralsInInterpolation:
 
 Style/Documentation:
   Exclude:
-    - 'lib/umami/models/*.rb'
-    - 'lib/umami/models.rb'
     - 'test/**/*'
 
 Style/ClassAndModuleChildren:

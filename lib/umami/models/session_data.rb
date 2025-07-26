@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents custom data associated with a session
     class SessionData < Base
       self.table_name = "session_data"
       self.primary_key = "session_data_id"

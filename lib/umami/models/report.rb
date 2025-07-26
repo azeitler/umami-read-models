@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents a saved report configuration
     class Report < Base
       self.table_name = "report"
       self.primary_key = "report_id"

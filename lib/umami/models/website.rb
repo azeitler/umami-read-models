@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents a website being tracked
     class Website < Base
       self.table_name = "website"
       self.primary_key = "website_id"

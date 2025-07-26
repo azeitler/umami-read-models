@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents team membership
     class TeamUser < Base
       self.table_name = "team_user"
       self.primary_key = "team_user_id"

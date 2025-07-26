@@ -2,6 +2,7 @@
 
 module Umami
   module Models
+    # Represents custom data associated with an event
     class EventData < Base
       self.table_name = "event_data"
       self.primary_key = "event_data_id"

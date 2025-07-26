@@ -24,4 +24,3 @@ module Umami
       end
     end
   end
-end

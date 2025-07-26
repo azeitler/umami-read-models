@@ -13,10 +13,10 @@ require "uri"
 
 # Colors for output
 class String
-  def green; "\e[32m#{self}\e[0m" end
-  def red; "\e[31m#{self}\e[0m" end
-  def yellow; "\e[33m#{self}\e[0m" end
-  def blue; "\e[34m#{self}\e[0m" end
+  def green = "\e[32m#{self}\e[0m"
+  def red = "\e[31m#{self}\e[0m"
+  def yellow = "\e[33m#{self}\e[0m"
+  def blue = "\e[34m#{self}\e[0m"
 end
 
 puts "Umami Read Models - Connection Validation".blue
@@ -34,14 +34,14 @@ puts "✓ DATABASE_URL found".green
 
 # Since we're using DATABASE_URL directly, we don't need Rails database config
 # Just use the default connection
-ActiveRecord::Base.establish_connection(ENV["DATABASE_URL"])
+ActiveRecord::Base.establish_connection(ENV.fetch("DATABASE_URL", nil))
 
 # Test configuration - skip this since we're not in a Rails app with named databases
 puts "\n1. Testing database connection...".yellow
 begin
   ActiveRecord::Base.connection.execute("SELECT 1")
   puts "✓ Database connection working".green
-rescue => e
+rescue StandardError => e
   puts "✗ Database connection failed: #{e.message}".red
   exit 1
 end
@@ -50,23 +50,23 @@ end
 puts "\n2. Testing Rails-style database configuration...".yellow
 begin
   # Parse the DATABASE_URL to get connection parameters
-  uri = URI.parse(ENV["DATABASE_URL"])
+  uri = URI.parse(ENV.fetch("DATABASE_URL", nil))
   db_config_hash = {
     adapter: uri.scheme == "postgres" ? "postgresql" : uri.scheme,
     host: uri.host,
     port: uri.port || 5432,
-    database: uri.path[1..-1], # Remove leading slash
+    database: uri.path[1..], # Remove leading slash
     username: uri.user,
     password: uri.password
   }
-  
+
   # Add any query parameters (like sslmode, channel_binding, etc.)
   if uri.query
     URI.decode_www_form(uri.query).each do |key, value|
       db_config_hash[key.to_sym] = value
     end
   end
-  
+
   # Create the configuration using the current environment
   current_env = ActiveRecord::ConnectionHandling::DEFAULT_ENV.call
   db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
@@ -74,22 +74,22 @@ begin
     "umami",
     db_config_hash
   )
-  
+
   # Register this configuration
   ActiveRecord::Base.configurations = {
     current_env => { "umami" => db_config.configuration_hash }
   }
-  
+
   # Now test the gem's configuration
   Umami::Models.configure do |config|
     config.database = :umami
   end
-  
+
   # Verify it works by testing a query
   Umami::Models::Website.connection.execute("SELECT 1")
   puts "✓ Rails-style configuration working".green
   puts "  (In a Rails app, use: config.database = :umami)".green
-  
+
   # Also test multi-database configuration
   Umami::Models.configure do |config|
     config.database = { writing: :umami, reading: :umami }
@@ -97,7 +97,7 @@ begin
   Umami::Models::Website.connection.execute("SELECT 1")
   puts "✓ Multi-database configuration also works".green
   puts "  (For read replicas: { writing: :umami, reading: :umami_replica })".green
-rescue => e
+rescue StandardError => e
   puts "✗ Rails-style configuration failed: #{e.message}".red
   puts "  Note: This is optional - direct DATABASE_URL connection still works".yellow
 end
@@ -129,7 +129,7 @@ begin
   puts "   Sessions: #{Umami::Models::Session.count}"
   puts "   Events: #{Umami::Models::WebsiteEvent.count}"
   puts "✓ Basic queries working".green
-rescue => e
+rescue StandardError => e
   puts "✗ Query failed: #{e.message}".red
   puts "  Make sure the Umami database schema is set up correctly".yellow
 end
@@ -138,15 +138,15 @@ end
 puts "\n4. Testing associations...".yellow
 begin
   if (website = Umami::Models::Website.first)
-    puts "   Testing website: #{website.name || 'Unnamed'}"
+    puts "   Testing website: #{website.name || "Unnamed"}"
     puts "   - Sessions count: #{website.sessions.count}"
     puts "   - Events count: #{website.website_events.count}"
-    puts "   - Has user: #{website.user ? 'Yes' : 'No'}"
+    puts "   - Has user: #{website.user ? "Yes" : "No"}"
     puts "✓ Associations working".green
   else
     puts "   No websites found to test associations".yellow
   end
-rescue => e
+rescue StandardError => e
   puts "✗ Association test failed: #{e.message}".red
 end
 
@@ -158,7 +158,7 @@ begin
   puts "   Recent sessions: #{Umami::Models::Session.recent.limit(5).count}"
   puts "   Page views: #{Umami::Models::WebsiteEvent.page_views.count}"
   puts "✓ Scopes working".green
-rescue => e
+rescue StandardError => e
   puts "✗ Scope test failed: #{e.message}".red
 end
 
@@ -193,7 +193,7 @@ begin
   else
     puts "   No users found to test update/delete protection".yellow
   end
-rescue => e
+rescue StandardError => e
   puts "✗ Read-only test failed: #{e.message}".red
 end
 
@@ -203,13 +203,13 @@ begin
   # Get top pages for the last 30 days
   if (website = Umami::Models::Website.first)
     top_pages = Umami::Models::WebsiteEvent
-      .by_website(website.website_id)
-      .page_views
-      .by_date_range(30.days.ago, Time.current)
-      .group(:url_path)
-      .order("count_all DESC")
-      .limit(5)
-      .count
+                .by_website(website.website_id)
+                .page_views
+                .by_date_range(30.days.ago, Time.current)
+                .group(:url_path)
+                .order("count_all DESC")
+                .limit(5)
+                .count
 
     puts "   Top 5 pages (last 30 days):"
     top_pages.each do |path, count|
@@ -220,9 +220,9 @@ begin
   else
     puts "   No websites found for complex query test".yellow
   end
-rescue => e
+rescue StandardError => e
   puts "✗ Complex query failed: #{e.message}".red
 end
 
-puts "\n" + "=" * 50
+puts "\n#{"=" * 50}"
 puts "Test completed!".blue

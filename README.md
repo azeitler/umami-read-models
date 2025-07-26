@@ -248,6 +248,31 @@ SQL
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
+### Releasing a New Version
+
+1. Update the version number in `lib/umami/models/version.rb`
+2. Update the CHANGELOG.md with the new version and changes
+3. Commit the changes: `git commit -am "Release version X.Y.Z"`
+4. Create a tag: `git tag vX.Y.Z`
+5. Push the changes and tag: `git push origin main --tags`
+
+The GitHub Action will automatically:
+- Run the test suite
+- Build the gem
+- Publish to RubyGems.org
+- Create a GitHub release
+
+**Note**: You need to set up the `RUBYGEMS_API_KEY` secret in your GitHub repository settings for automatic publishing to work.
+
+### Manual Release
+
+If you need to release manually:
+
+```bash
+gem build umami-read-models.gemspec
+gem push umami-read-models-*.gem
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/azeitler/umami-read-models.
